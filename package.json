@@ -1,0 +1,19 @@
+{
+  "name": "horse.link",
+  "version": "1.0.0",
+  "description": "Offical website for horse.link horse racing Ethereum oracle",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bitcoinbrisbane/horse.link.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bitcoinbrisbane/horse.link/issues"
+  },
+  "homepage": "https://github.com/bitcoinbrisbane/horse.link#readme"
+}
