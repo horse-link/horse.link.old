@@ -1,5 +1,12 @@
 pragma solidity 0.7.0;
 
+struct Result {
+    uint first;
+    uint second;
+    uint third;
+    uint forth;
+}
+
 contract Horse {
 
     address private _owner;
