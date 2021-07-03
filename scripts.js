@@ -15,9 +15,18 @@ const getTodaysRaces = async () => {
   // console.log(result.data?.meetings);
 
   result.data?.meetings.forEach((element) => {
-    if (element.results) {
-        console.log(element);
-    }
+    //if (element.results) {
+    // console.log(element);
+    //}
+
+    element.races.forEach((race) => {
+      if (race.results && race.results.length > 0) {
+        console.log(element.meetingName);
+        console.log(element.venueMnemonic);
+        console.log(race.raceName);
+        console.log(race.results);
+      }
+    });
   });
 };
 
