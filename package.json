@@ -18,7 +18,9 @@
   "homepage": "https://github.com/bitcoinbrisbane/horse.link#readme",
   "dependencies": {
     "@openzeppelin/contracts": "^4.2.0",
+    "@truffle/hdwallet-provider": "^1.4.1",
     "axios": "^0.21.1",
-    "dotenv": "^10.0.0"
+    "dotenv": "^10.0.0",
+    "truffle-plugin-verify": "^0.5.10"
   }
 }
