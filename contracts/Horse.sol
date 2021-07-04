@@ -14,11 +14,13 @@ struct Result {
 
 contract Horse is Ownable {
 
-    mapping(address => mapping(bytes32 => mapping(uint => mapping(uint => mapping(uint => mapping(uint => uint[])))))) public results;
+    uint256 public count;
 
-    function addResult(bytes32 mnemonic, uint year, uint month, uint day, uint race, uint[] memory _results) public {
+    mapping(address => mapping(bytes32 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256[])))))) public results;
+
+    function addResult(bytes32 mnemonic, uint256 year, uint256 month, uint256 day, uint256 race, uint256[] memory _results) public {
         results[msg.sender][mnemonic][year][month][day][race] = _results;
-
+        count++;
         emit ResultAdded(msg.sender, block.timestamp, mnemonic, year, month, day, race);
     }
 
