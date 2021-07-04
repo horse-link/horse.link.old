@@ -8,7 +8,6 @@ const json = require("./build/contracts/Horse.json");
 const getCount = async () => {
   const projectID = process.env.PROJECT_ID;
   const web3 = new Web3(`https://kovan.infura.io/v3/${projectID}`);
-  // const web3 = new Web3(process.env.NODE);
   const contract = new web3.eth.Contract(json.abi, "0x95f7594Dc262bb6A969Aeb42E4D9E4BedA94FAa0");
   
   const count = await contract.methods.count().call();
@@ -53,15 +52,17 @@ const getTodaysRaces = async () => {
         console.log(`${element.meetingDate} ${element.meetingName} ${element.venueMnemonic}`);
         console.log(`${race.raceNumber} ${race.raceName}`);
         console.log(race.results);
+
+        // let sha = element.filter(x => x.venueMnemonic > "SHA");
       }
     });
   });
 };
 
 getCount();
-// getTodaysRaces();
+getTodaysRaces();
 
 //2021-07-04 SHA TIN SHA
 // 2 THE PURVES QUAICH TURF
 // [ [ 12 ], [ 4 ], [ 8 ], [ 11 ] ]
-addResult("0x534841", 2021, 7, 4, 2, 12, 4, 8, 11);
+// addResult("0x534841", 2021, 7, 4, 2, 12, 4, 8, 11);
