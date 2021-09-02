@@ -20,6 +20,7 @@
     "@openzeppelin/contracts": "^4.2.0",
     "@truffle/hdwallet-provider": "^1.4.1",
     "axios": "^0.21.1",
+    "bytes32": "^0.0.3",
     "dotenv": "^10.0.0",
     "truffle-plugin-verify": "^0.5.10",
     "web3": "^1.4.0"
