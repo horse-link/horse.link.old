@@ -82,11 +82,12 @@ const getTodaysRaces = async () => {
 
 const getAndAddTodaysRaces = async () => {
   const todaysResults = await getTodaysRaces();
-  addResult(todaysResults[0]);
+  await addResult(todaysResults[2]);
+  console.log("done!");
 }
 
 getCount();
-// getAndAddTodaysRaces();
+getAndAddTodaysRaces();
 
 
 //2021-07-04 SHA TIN SHA
