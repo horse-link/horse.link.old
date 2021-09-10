@@ -1,26 +1,29 @@
-// require("dotenv");
-require('dotenv').config();
+require("dotenv").config();
 const axios = require("axios");
 const Web3 = require("web3");
 const bytes32 = require("bytes32");
 const HDWalletProvider = require("@truffle/hdwallet-provider");
 
-const json = require("./build/contracts/Horse.json");
+const Horse = require("./build/contracts/Horse.json");
 
 const getCount = async () => {
   const projectID = process.env.PROJECT_ID;
   const web3 = new Web3(`https://kovan.infura.io/v3/${projectID}`);
-  const contract = new web3.eth.Contract(json.abi, process.env.CONTRACT_ADDRESS);
+  const contract = new web3.eth.Contract(Horse.abi, process.env.CONTRACT_ADDRESS);
   
   const count = await contract.methods.count().call();
   console.log(count);
 }
 
-const addResult = async(result) => {
-  await _addResult(result.track, result.year, result.month, result.day, result.number, result.first, result.second, result.third, result.forth);
+const addResult = (result) => {
+  _addResult(result.track, result.year, result.month, result.day, result.number, result.first, result.second, result.third, result.forth);
 }
 
-const _addResult = async (track, year, month, day, race, first, second, third, forth) => {
+const addResultAsync = async(result) => {
+  await _addResultAsync(result.track, result.year, result.month, result.day, result.number, result.first, result.second, result.third, result.forth);
+}
+
+const _addResultAsync = async (track, year, month, day, race, first, second, third, forth) => {
   const projectID = process.env.PROJECT_ID;
   const privateKey = process.env.PRIVATE_KEY;
   const provider = new HDWalletProvider({
@@ -38,6 +41,22 @@ const _addResult = async (track, year, month, day, race, first, second, third, f
   const _nm = bytes32({ input: track });
   const result = await contract.methods.addResult(_nm, year, month, day, race, [first, second, third, forth]).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
   console.log(result);
+}
+
+const _addResult = (track, year, month, day, race, first, second, third, forth) => {
+  const projectID = process.env.PROJECT_ID;
+  const privateKey = process.env.PRIVATE_KEY;
+  const provider = new HDWalletProvider({
+    mnemonic: {
+      phrase: process.env.MNEMONIC
+    },
+    providerOrUrl: `https://kovan.infura.io/v3/${projectID}`
+  });
+
+  const web3 = new Web3(provider);
+  const contract = new web3.eth.Contract(json.abi, process.env.CONTRACT_ADDRESS);
+  const _nm = bytes32({ input: track });
+  contract.methods.addResult(_nm, year, month, day, race, [first, second, third, forth]).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
 }
 
 const getTodaysRaces = async () => {
@@ -82,12 +101,17 @@ const getTodaysRaces = async () => {
 
 const getAndAddTodaysRaces = async () => {
   const todaysResults = await getTodaysRaces();
-  await addResult(todaysResults[2]);
+  await addResultAsync(todaysResults[2]);
   console.log("done!");
 }
 
+const getAndAddTodaysRaces2 = async () => {
+  const todaysResults = await getTodaysRaces();
+  addResult(todaysResults[0]);
+}
+
 getCount();
-getAndAddTodaysRaces();
+getAndAddTodaysRaces2();
 
 
 //2021-07-04 SHA TIN SHA
