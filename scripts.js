@@ -37,7 +37,7 @@ const _addResultAsync = async (track, year, month, day, race, first, second, thi
   const accounts = await web3.eth.getAccounts();
   console.log(accounts[0]);
 
-  const contract = new web3.eth.Contract(json.abi, process.env.CONTRACT_ADDRESS);
+  const contract = new web3.eth.Contract(Horse.abi, process.env.CONTRACT_ADDRESS);
   const _nm = bytes32({ input: track });
   const result = await contract.methods.addResult(_nm, year, month, day, race, [first, second, third, forth]).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
   console.log(result);
@@ -54,7 +54,7 @@ const _addResult = (track, year, month, day, race, first, second, third, forth) 
   });
 
   const web3 = new Web3(provider);
-  const contract = new web3.eth.Contract(json.abi, process.env.CONTRACT_ADDRESS);
+  const contract = new web3.eth.Contract(Horse.abi, process.env.CONTRACT_ADDRESS);
   const _nm = bytes32({ input: track });
   contract.methods.addResult(_nm, year, month, day, race, [first, second, third, forth]).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
 }
@@ -66,7 +66,10 @@ const getTodaysRaces = async () => {
   const yyyy = today.getFullYear();
 
   console.log(`${yyyy}-${mm}-${dd}`);
+  await getRaces(yyyy, mm, dd);
+};
 
+const getRaces = async (yyyy, mm, dd) => {
   const result = await axios.get(
     `https://api.beta.tab.com.au/v1/tab-info-service/racing/dates/${yyyy}-${mm}-${dd}/meetings?jurisdiction=QLD`
   );
@@ -101,7 +104,8 @@ const getTodaysRaces = async () => {
 
 const getAndAddTodaysRaces = async () => {
   const todaysResults = await getTodaysRaces();
-  await addResultAsync(todaysResults[2]);
+  await addResultAsync(todaysResults[1]);
+  //addResult(todaysResults[1]);
   console.log("done!");
 }
 
@@ -111,10 +115,5 @@ const getAndAddTodaysRaces2 = async () => {
 }
 
 getCount();
-getAndAddTodaysRaces2();
+getAndAddTodaysRaces();
 
-
-//2021-07-04 SHA TIN SHA
-// 2 THE PURVES QUAICH TURF
-// [ [ 12 ], [ 4 ], [ 8 ], [ 11 ] ]
-// addResult("CSO", 2021, 9, 2, 11, 6, 2, 5, 9);

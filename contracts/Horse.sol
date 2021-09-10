@@ -19,6 +19,7 @@ contract Horse is Ownable {
     mapping(bytes32 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256[]))))) public results;
 
     function addResult(bytes32 mnemonic, uint256 year, uint256 month, uint256 day, uint256 race, uint256[] memory _results) public {
+        require(results[mnemonic][year][month][day][race].timestamp = 0, "Already set");
         results[mnemonic][year][month][day][race] = _results;
         count++;
         emit ResultAdded(msg.sender, block.timestamp, mnemonic, year, month, day, race);
