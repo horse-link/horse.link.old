@@ -19,11 +19,13 @@ const addResult = (result) => {
   _addResult(result.track, result.year, result.month, result.day, result.number, result.first, result.second, result.third, result.forth);
 }
 
-const addResultAsync = async(result) => {
-  await _addResultAsync(result.track, result.year, result.month, result.day, result.number, result.first, result.second, result.third, result.forth);
+const addResultAsync = async (result) => {
+  console.log(`Adding result for Race ${result.number} at track ${result.track} ${result.day}-${result.month}-${result.year}`);
+  const results = [Number(result.first), Number(result.second), Number(result.third), Number(result.forth)];
+  await _addResultAsync(result.track, Number(result.year), Number(result.month), Number(result.day), Number(result.number), results);
 }
 
-const _addResultAsync = async (track, year, month, day, race, first, second, third, forth) => {
+const _addResultAsync = async (track, year, month, day, race, results) => {
   const projectID = process.env.PROJECT_ID;
   const privateKey = process.env.PRIVATE_KEY;
   const provider = new HDWalletProvider({
@@ -35,12 +37,10 @@ const _addResultAsync = async (track, year, month, day, race, first, second, thi
 
   const web3 = new Web3(provider);
   const accounts = await web3.eth.getAccounts();
-  console.log(accounts[0]);
 
   const contract = new web3.eth.Contract(Horse.abi, process.env.CONTRACT_ADDRESS);
   const _nm = bytes32({ input: track });
-  const result = await contract.methods.addResult(_nm, year, month, day, race, [first, second, third, forth]).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
-  console.log(result);
+  const result = await contract.methods.addResult(_nm, year, month, day, race, results).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
 }
 
 const _addResult = (track, year, month, day, race, first, second, third, forth) => {
@@ -66,7 +66,7 @@ const getTodaysRaces = async () => {
   const yyyy = today.getFullYear();
 
   console.log(`${yyyy}-${mm}-${dd}`);
-  await getRaces(yyyy, mm, dd);
+  return await getRaces(yyyy, mm, dd);
 };
 
 const getRaces = async (yyyy, mm, dd) => {
@@ -88,10 +88,10 @@ const getRaces = async (yyyy, mm, dd) => {
           month: mm,
           day: dd,
           number: race.raceNumber,
-          first: race.results[0], 
-          second: race.results[1], 
-          third: race.results[2], 
-          forth: race.results[3]
+          first: race.results[0] || 0, 
+          second: race.results[1] || 0, 
+          third: race.results[2] || 0, 
+          forth: race.results[3] || 0
         }
 
         results.push(_result);
@@ -104,16 +104,26 @@ const getRaces = async (yyyy, mm, dd) => {
 
 const getAndAddTodaysRaces = async () => {
   const todaysResults = await getTodaysRaces();
-  await addResultAsync(todaysResults[1]);
-  //addResult(todaysResults[1]);
+
+  for (let i = 0; i < todaysResults.length; i++) {
+  //for (let i = 2; i < 5; i++) {
+    await addResultAsync(todaysResults[i]);
+  }
+
   console.log("done!");
 }
 
-const getAndAddTodaysRaces2 = async () => {
-  const todaysResults = await getTodaysRaces();
-  addResult(todaysResults[0]);
+const getAndAddRaces = async (yyyy, mm, dd) => {
+  const results = await getRaces(yyyy, mm, dd);
+
+  for (let i = 0; i < results.length; i++) {
+    await addResultAsync(results[i]);
+  }
+
+  console.log("done!");
 }
 
 getCount();
+// getAndAddRaces("2021", "09", "12");
 getAndAddTodaysRaces();
 

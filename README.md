@@ -2,4 +2,5 @@
 Offical website for horse.link horse racing Ethereum oracle
 
 ## Kovan
-`0xEedD810CDf9FE1B107Ae2350be71985764f552fF`
+Horse Link: `0xaFab468B37c77C35223E5d1b11F378F09E0326C9`
+Horse ERC20 Token:  `0x1Ab87d843E31248e0e094dc7444A40048ee01FB7`
