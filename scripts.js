@@ -40,7 +40,13 @@ const _addResultAsync = async (track, year, month, day, race, results) => {
 
   const contract = new web3.eth.Contract(Horse.abi, process.env.CONTRACT_ADDRESS);
   const _nm = bytes32({ input: track });
-  const result = await contract.methods.addResult(_nm, year, month, day, race, results).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
+
+  try {
+    const result = await contract.methods.addResult(_nm, year, month, day, race, results).send({ from: accounts[0]}); // , gas: 50000, gasPrice: 10e9
+  } catch (e) {
+    console.log(e);
+  }
+  
 }
 
 const _addResult = (track, year, month, day, race, first, second, third, forth) => {
