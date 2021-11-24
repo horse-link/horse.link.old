@@ -1,5 +1,5 @@
 # horse.link
-Offical website for horse.link horse racing Ethereum oracle
+Offical website for https://horse.link horse racing Ethereum oracle
 
 ## Kovan
 Owner: `0xfDBe64ec50cA548c7A304959D0f385A01D315a71`  
