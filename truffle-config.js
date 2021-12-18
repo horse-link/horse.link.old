@@ -6,6 +6,21 @@ module.exports = {
     "truffle-plugin-verify"
   ],
   networks: {
+    mumbai: {
+      provider: () => {
+        return new HDWalletProvider({
+          mnemonic: {
+            phrase: process.env.MNEMONIC
+          },
+          providerOrUrl: process.env.P_NODE
+        })
+      },
+      network_id: 80001,
+      gas: 4500000,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      skipDryRun: true,
+    },
     kovan: {
       provider: () => {
         return new HDWalletProvider({
@@ -63,6 +78,7 @@ module.exports = {
     },
   },
   api_keys: {
-    etherscan: process.env.ETH_SCAN_API_KEY
+    etherscan: process.env.ETH_SCAN_API_KEY,
+    polyscan: process.env.POLY_API_KEY
   }
 };

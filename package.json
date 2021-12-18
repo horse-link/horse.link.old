@@ -4,7 +4,8 @@
   "description": "Offical website for horse.link horse racing Ethereum oracle",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "publish": "nodejs scripts.js"
   },
   "repository": {
     "type": "git",

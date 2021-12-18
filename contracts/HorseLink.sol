@@ -10,6 +10,13 @@ struct Result {
     uint256 timestamp;
 }
 
+struct Track {
+    bytes32 name;
+    bytes32 mnemonic;
+    int8 timezone;
+    address owner;
+}
+
 contract HorseLink is Ownable {
     using BokkyPooBahsDateTimeLibrary for uint;
     uint256 public count;
