@@ -4,7 +4,7 @@ pragma solidity =0.8.6;
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
 import "./IOracle.sol";
 
-contract TabClient is ChainlinkClient, IOracle {
+contract TabOracle is ChainlinkClient, IOracle {
     using Chainlink for Chainlink.Request;
 
     address private oracle;
