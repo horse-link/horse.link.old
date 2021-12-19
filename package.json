@@ -24,6 +24,7 @@
     "axios": "^0.21.1",
     "bytes32": "^0.0.3",
     "dotenv": "^10.0.0",
+    "truffle": "^5.4.25",
     "truffle-plugin-verify": "^0.5.10",
     "web3": "^1.4.0"
   }
