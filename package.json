@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/bitcoinbrisbane/horse.link#readme",
   "dependencies": {
+    "@chainlink/contracts": "^0.2.2",
     "@openzeppelin/contracts": "^4.2.0",
     "@truffle/hdwallet-provider": "^1.4.1",
     "axios": "^0.21.1",
