@@ -8,7 +8,7 @@ contract Token is ERC20, Ownable {
 
     address private _pool;
 
-    constructor() ERC20("Horse Link", "HORSE") {
+    constructor() ERC20("Horse Link Pool Tokens", "HORSE") {
 
     }
     
