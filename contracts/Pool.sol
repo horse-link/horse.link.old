@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.6;
+pragma solidity =0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -9,29 +9,39 @@ contract Pool is Ownable {
     mapping(address => uint256) private balances;
     uint256 private _tlv;
     uint256 private _inPlay;
-    address private immutable _token;
+    address private immutable _underlying;
+    address private immutable _self;
+
+    mapping(address => bool) public oracles;
 
     function balanceOf(address who) external view returns (uint256) {
         return balances[who];
     }
 
-    function getTokenAddress() external view returns (address) {
-        return _token;
+    function getUnderlying() external view returns (address) {
+        return _underlying;
     }
 
     function getTLV() external view returns (uint256) {
         return _tlv;
     }
 
-    constructor(address token) {
-        require(token != address(0), "Address must be set");
-        _token = token;
+    constructor(address underlying, address[] memory _oracles) {
+        require(underlying != address(0), "Address must be set");
+        _underlying = underlying;
+        
+        for (uint256 i; i < _oracles.length; i++) {
+            require(_oracles[i] != address(0), "Address must be set");
+            oracles[_oracles[i]] = true;
+        }
+
+        _self = address(this);
     }
 
     function supply(uint256 value) external {
         require(value > 0, "Value must be greater than 0");
 
-        IERC20(_token).transferFrom(msg.sender, address(this), value);
+        IERC20(_underlying).transferFrom(msg.sender, _self, value);
         balances[msg.sender] += value;
         _tlv += value;
 
@@ -39,13 +49,14 @@ contract Pool is Ownable {
     }
 
     function exit() external {
-        uint256 amount = balances[msg.sender];
+        // get the amount of tokens that the user has proportionate to the pool
+        uint256 amount = _tlv / balances[msg.sender];
         require(amount > 0, "You must have a balance to exit");
 
-        IERC20(_token).approve(msg.sender, amount);
-        IERC20(_token).transferFrom(msg.sender, address(this), amount);
+        IERC20(_underlying).transfer(msg.sender, amount);
+
         balances[msg.sender] = 0;
-        _tlv -= balances[msg.sender];
+        _tlv -= amount;
 
         emit Exited(msg.sender, amount);
     }

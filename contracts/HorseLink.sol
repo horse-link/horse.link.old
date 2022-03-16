@@ -6,7 +6,7 @@ import "./BokkyPooBahsDateTimeLibrary.sol";
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 struct Result {
-    uint256[] results;
+    uint8[] results;
     uint256 timestamp;
 }
 
@@ -25,13 +25,23 @@ contract HorseLink is Ownable {
     mapping(address => uint256) public rewards;
 
     // mapping(bytes32 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => uint256[]))))) public results;
-    mapping(bytes32 => mapping(uint256 => mapping(uint256 => mapping(uint256 => mapping(uint256 => Result))))) public results;
+    // track mnemonic, year, month, day, race number
+    mapping(bytes32 => mapping(uint8 => mapping(uint8 => mapping(uint8 => mapping(uint8 => Result))))) public results;
+
+    function getResult(bytes32 track, uint8 year, uint8 month, uint8 day, uint8 race, uint8 position) external view returns (uint8) {
+        Result memory result = results[track][year][month][day][race];
+
+        require(result.timestamp > 0, "Invalid request");
+        require(result.results.length < position, "Invalid position");
+        
+        return result.results[position];
+    }
 
     constructor(address _token) {
         token = _token;
     }
 
-    function addResult(bytes32 mnemonic, uint256 year, uint256 month, uint256 day, uint256 race, uint256[] memory _results) public {
+    function addResult(bytes32 mnemonic, uint8 year, uint8 month, uint8 day, uint8 race, uint8[] memory _results) public {
         require(year >= 1970, "Too far in the past");
         require(BokkyPooBahsDateTimeLibrary.isValidDate(year, month, day), "Invalid date");
         require(BokkyPooBahsDateTimeLibrary.timestampFromDate(year, month, day) < block.timestamp, "Cannot add results of future events");

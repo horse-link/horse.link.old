@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.6;
+pragma solidity =0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
@@ -20,6 +20,7 @@ contract Market is Ownable {
     // mapping(address => Bet[]) private _bets;
 
     Bet[] private _bets;
+    mapping(bytes32 => uint256) private _betIds;
  
     function getPoolAddress() external view returns (address) {
         return _pool;
@@ -34,6 +35,12 @@ contract Market is Ownable {
     }
 
     function back(bytes32 id, uint256 amount, uint256 odds, uint256 start, uint256 end, bytes32 calldata signature) external returns (uint256) {
+        bytes32 _hash = keccak256(id, amount, odds, start, end, signature);
+        address author = recoverSigner(_hash, signature);
+
+        require(author == msg.sender, "Only the author can back");
+
+        require(_betIds[id] == 0, "Already placed");
         require(start < block.timestamp, "Betting start time has not passed");
         return _bets.length;
     }

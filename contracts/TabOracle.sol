@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.6;
+pragma solidity =0.8.10;
 
 import "@chainlink/contracts/src/v0.8/ChainlinkClient.sol";
-import "./IOracle.sol";
+import "./IHorseOracle.sol";
 
-contract TabOracle is ChainlinkClient, IOracle {
+contract TabOracle is ChainlinkClient, IHorseOracle {
     using Chainlink for Chainlink.Request;
 
     address private oracle;
@@ -25,7 +25,7 @@ contract TabOracle is ChainlinkClient, IOracle {
         fee = 0.1 * 10 ** 18; // (Varies by network and job)
     }
 
-    function getResult(bytes32 track, uint256 year, uint256 month, uint256 day, uint8 race, uint8 position) external override returns (uint8) {
+    function getResult(bytes32 track, uint8 year, uint8 month, uint8 day, uint8 race, uint8 position) external view returns (uint8) {
         return 0;
     }
 }
