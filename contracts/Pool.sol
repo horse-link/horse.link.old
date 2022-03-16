@@ -20,8 +20,8 @@ contract Pool is Ownable {
     uint256 private _supplied; // total added to the contract from LPs
     uint256 private _inPlay;
 
-    address private immutable _lpToken;
-    address private immutable _rewardsToken;
+    // address private immutable _lpToken;
+    //  address private immutable _rewardsToken;
     address private immutable _underlying;
 
     uint256 private constant PRECISSION = 1_000;
