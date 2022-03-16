@@ -1,51 +1,80 @@
 // SPDX-License-Identifier: MIT
-pragma solidity =0.8.6;
+pragma solidity =0.8.10;
 
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../IMintable.sol";
+import "../IBurnable.sol";
+
+struct Rewards {
+    uint256 balance;
+    uint256 start;
+}
 
 contract Pool is Ownable {
+    // Rewards
+    mapping(address => Reward) private _rewards;
+    uint256 private constant REWARDS_PER_BLOCK;
 
-    mapping(address => uint256) private balances;
-    uint256 private _tlv;
+    // Wages
+    uint256 private _supplied; // total added to the contract from LPs
     uint256 private _inPlay;
-    address private immutable _token;
 
-    function balanceOf(address who) external view returns (uint256) {
-        return balances[who];
+    address private immutable _lpToken;
+    address private immutable _rewardsToken;
+    address private immutable _underlying;
+
+    uint256 private constant PRECISSION = 1_000;
+
+    function getUnderlying() external view returns (address) {
+        return _underlying;
     }
 
-    function getTokenAddress() external view returns (address) {
-        return _token;
+    function getUnderlyingBalance() public view returns (uint256) {
+        return IERC20(_underlying).balanceOf(address(this));;
     }
 
-    function getTLV() external view returns (uint256) {
-        return _tlv;
+    function getPoolPerformance() external returns (int256) {
+        uint256 underlyingBalance = IERC20(_underlying).balanceOf(address(this));
+        return _supplied / underlyingBalance;
     }
 
-    constructor(address token) {
-        require(token != address(0), "Address must be set");
-        _token = token;
+    function getLPTokenAddress() external view returns (address) {
+        return _lpToken;
     }
 
-    function supply(uint256 value) external {
-        require(value > 0, "Value must be greater than 0");
-
-        IERC20(_token).transferFrom(msg.sender, address(this), value);
-        balances[msg.sender] += value;
-        _tlv += value;
-
-        emit Supplied(msg.sender, value);
+    function supplied() external view returns (uint256) {
+        return _supplied;
     }
 
-    function exit() external {
-        uint256 amount = balances[msg.sender];
-        require(amount > 0, "You must have a balance to exit");
+    function totalReserves() external view returns (uint256) {
+        return _tlv - _inPlay;
+    }
 
-        IERC20(_token).approve(msg.sender, amount);
+    constructor(address lpToken, address underlying) {
+        require(token != address(0) && underlying != address(0), "Invalid address");
+        _lpToken = lpToken;
+        _underlying = underlying;
+    }
+
+    // Tokens added to the pool
+    function supply(uint256 amount) external {
+        require(amount > 0, "Value must be greater than 0");
+
         IERC20(_token).transferFrom(msg.sender, address(this), amount);
-        balances[msg.sender] = 0;
-        _tlv -= balances[msg.sender];
+        IMintable(_lpToken).mintTo(msg.sender,amount);
+
+        _supplied += amount;
+
+        emit Supplied(msg.sender, amount);
+    }
+
+    function exit(uint256 amount) external {
+        require(amount > IERC20(_lpToken).balanceOf(msg.sender), "You must have a balance to exit");
+
+        // Burn the LP Token
+        IBurnable(_lpToken).burnFrom(msg.sender, amount);
+        _supplied -= amount;
 
         emit Exited(msg.sender, amount);
     }

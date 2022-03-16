@@ -17,25 +17,61 @@ struct Bet {
 contract Market is Ownable {
 
     address private immutable _pool;
+    uint256 private immutable _fee;
+
     // mapping(address => Bet[]) private _bets;
 
     Bet[] private _bets;
+
+    uint256 private _totalInPlay;
+    uint256 private _totalDebt;
+
+    function getInplayCount() public view returns (uint256) {
+        return _bets.length;
+    }
+
+    // function getBet(uint256 index) public view returns (bytes32, uint256, uint256, uint256, bool, address) {
+    //     return (_bets[index].id, _bets[index].amount, _bets[index].payout, _bets[index].payoutDate, _bets[index].claimed, _bets[index].owner);
+    // }
  
     function getPoolAddress() external view returns (address) {
         return _pool;
     }
 
-    constructor(address pool, uint256 maxSlippage) {
+    constructor(address pool, uint256 fee) {
         _pool = pool;
+        _fee = fee;
     }
 
     function getBet(uint256 index) external view returns (uint256, uint256, uint256, bool, address) {
         return (_bets[index].amount, _bets[index].payout, _bets[index].payoutDate, _bets[index].claimed, _bets[index].owner);
     }
 
-    function back(bytes32 id, uint256 amount, uint256 odds, uint256 start, uint256 end, bytes32 calldata signature) external returns (uint256) {
-        require(start < block.timestamp, "Betting start time has not passed");
+    function back(bytes32 id, uint256 amount, uint256 odds, uint256 start, uint256 end, bytes memory signature) external returns (uint256) {
+        require(start < block.timestamp, "Betting start time has passed");
+        bytes32 message = keccak256(abi.encodePacked(id, amount, odds, start, end));
+        address owner = recoverSigner(message, signature);
+
+        require(owner == msg.sender, "Only the owner can back");
+        address underlying = IPool(_pool).getUnderlying();
+
+        IERC20(underlying).transferFrom(msg.sender, address(this), amount);
+        _bets.push(Bet(id, amount, amount * odds, start, false, owner));
+
+        _totalInPlay += amount;
+        _totalDebt += amount * odds;
+
+        emit BetPlaced(id, amount, odds, start, end, owner);
+
         return _bets.length;
+    }
+
+    function payoutAll() public {
+
+    }
+
+    function payout(uint256 index) public {
+
     }
 
     function recoverSigner(bytes32 message, bytes memory signature)
@@ -74,4 +110,6 @@ contract Market is Ownable {
 
         return (v, r, s);
     }
+
+    event BetPlaced(uint256 index, uint256 amount, uint256 payout, address indexed owner);
 }
