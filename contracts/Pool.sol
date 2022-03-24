@@ -16,53 +16,74 @@ contract Pool is Ownable {
     mapping(address => Reward) private _rewards;
     uint256 private constant REWARDS_PER_BLOCK;
 
-    // Wages
+    // Bets
     uint256 private _supplied; // total added to the contract from LPs
     uint256 private _inPlay;
 
-    // address private immutable _lpToken;
-    //  address private immutable _rewardsToken;
-    address private immutable _underlying;
+    // Balance of LPs
+    mapping(address => uint256) private _lps;
 
-    uint256 private constant PRECISSION = 1_000;
+    // address private immutable _lpToken;
+    // address private immutable _rewardsToken;
+    address private immutable _underlying;
+    address private immutable _self;
+
+    // uint256 private constant PRECISSION = 1_000;
 
     function getUnderlying() external view returns (address) {
         return _underlying;
     }
 
     function getUnderlyingBalance() public view returns (uint256) {
-        return IERC20(_underlying).balanceOf(address(this));;
+        return IERC20(_underlying).balanceOf(address(this));
     }
 
     function getPoolPerformance() external returns (int256) {
+        return _getPoolPerformance();
+    }
+
+    function _getPoolPerformance() private returns (uint256) {
         uint256 underlyingBalance = IERC20(_underlying).balanceOf(address(this));
-        return _supplied / underlyingBalance;
+        return _supplied * 1e6 / underlyingBalance * 1e6;
     }
 
     function getLPTokenAddress() external view returns (address) {
         return _lpToken;
     }
 
-    function supplied() external view returns (uint256) {
+    function totalSupplied() external view returns (uint256) {
         return _supplied;
     }
 
     function totalReserves() external view returns (uint256) {
-        return _tlv - _inPlay;
+        return _totalReserves();
+    }
+
+    function _totalReserves() private returns (uint256) {
+        return _supplied + _inPlay;
+    }
+
+    function supplied(address who) public returns (uint256) {
+        return _lps[who];
+    }
+
+    function balanceOf(address who) external view returns (int256) {
+        return _balanceOf(who) / _totalReserves();
     }
 
     constructor(address lpToken, address underlying) {
         require(token != address(0) && underlying != address(0), "Invalid address");
         _lpToken = lpToken;
         _underlying = underlying;
+        _self = address(this);
     }
 
     // Tokens added to the pool
     function supply(uint256 amount) external {
         require(amount > 0, "Value must be greater than 0");
 
-        IERC20(_token).transferFrom(msg.sender, address(this), amount);
-        IMintable(_lpToken).mintTo(msg.sender,amount);
+        IERC20(_token).transferFrom(msg.sender, _self, amount);
+        IMintable(_lpToken).mintTo(msg.sender, amount);
 
         _supplied += amount;
 
